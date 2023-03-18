@@ -105,7 +105,7 @@
         axios({
           method: "post",
           headers: {'content-type': 'application/x-www-form-urlencoded'},
-          url: "https://www.annikj.com/wjc/qn/qnContent",
+          url: "/api/wjc/qn/qnContent",
           data: {
             qnId: qnId,
             userId: 9496766,
