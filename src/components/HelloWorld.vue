@@ -1,15 +1,16 @@
 <template>
   <div class="hello">
     <h1>预约剩余票据查询</h1>
-    <el-row :gutter="10" type="flex" justify="center">
+    <el-row :gutter="10" >
       <el-col :sm="24" :md="12" :lg="6">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <h3>广州</h3>
             <span>{{GZInfo}}</span>
           </div>
-          <div v-for="GZitem in GZData"  class="text item">
-            <div style="font-size: 14px;color: #67C23A;">{{ GZitem["dayStr"]  + "：   剩余"+ GZitem["leftSeats"] +"个名额"}}</div>
+          <div v-for="GZitem in GZData"  class="text item el-collapse-item__content">
+            <div v-if="GZitem['leftSeats']>0" style="font-size: 14px;color: #67C23A;">{{ GZitem["dayStr"]  + "：   剩余"+ GZitem["leftSeats"] +"个名额"}}</div>
+            <div v-else style="font-size: 14px;">{{ GZitem["dayStr"]  + "：   剩余"+ GZitem["leftSeats"] +"个名额"}}</div>
           </div>
         </el-card>
       </el-col>
@@ -19,8 +20,9 @@
             <h3>上海</h3>
             <span>{{SHInfo}}</span>
           </div>
-          <div v-for="SHitem in SHData"  class="text item">
-            <div style="font-size: 14px;color: #67C23A;">{{ SHitem["dayStr"]  + "   剩余票数"+ SHitem["leftSeats"] }}</div>
+          <div v-for="SHitem in SHData"  class="text item el-collapse-item__content">
+            <div v-if="SHitem['leftSeats']>0" style="font-size: 14px;color: #67C23A;">{{ SHitem["dayStr"]  + "   剩余票数"+ SHitem["leftSeats"] }}</div>
+            <div v-else style="font-size: 14px;">{{ SHitem["dayStr"]  + "   剩余票数"+ SHitem["leftSeats"] }}</div>
           </div>
         </el-card>
       </el-col>
@@ -31,7 +33,8 @@
             <span>{{BJInfo}}</span>
           </div>
           <div v-for="BJitem in BJData"  class="text item el-collapse-item__content">
-            <div style="font-size: 14px;color: #67C23A;">{{ BJitem["dayStr"]  + "   剩余票数"+ BJitem["leftSeats"] }}</div>
+            <div v-if="BJitem['leftSeats']>0" style="font-size: 14px;color: #67C23A;">{{ BJitem["dayStr"]  + "   剩余票数"+ BJitem["leftSeats"] }}</div>
+            <div v-else style="font-size: 14px;">{{ BJitem["dayStr"]  + "   剩余票数"+ BJitem["leftSeats"] }}</div>
           </div>
         </el-card>
       </el-col>
@@ -43,7 +46,9 @@
             <el-button style="float: right; padding: 3px 0" type="text"></el-button>
           </div>
           <div v-for="XMitem in XMData"  class="text item el-collapse-item__content">
-            <div style="font-size: 14px;color: #67C23A;">{{ XMitem["dayStr"]  + "   剩余票数"+ XMitem["leftSeats"] }}</div>
+            <div v-if="XMitem['leftSeats']>0"  style="font-size: 14px;color: #67C23A;">{{ XMitem["dayStr"]  + "   剩余票数"+ XMitem["leftSeats"] }}</div>
+            <div v-else  style="font-size: 14px;">{{ XMitem["dayStr"]  + "   剩余票数"+ XMitem["leftSeats"] }}</div>
+
           </div>
         </el-card>
       </el-col>
@@ -80,8 +85,10 @@
         this.getReadData(793098, 2668, anniTime, randomStr);
         //上海
         this.getReadData(790545, 2619, anniTime, randomStr);
-        //北京
+        //北京3月
         this.getReadData(793610, 3063, anniTime, randomStr);
+        //北京3月后
+        this.getReadData(793610, 3720, anniTime, randomStr);
         //厦门
         this.getReadData(792057, 2635, anniTime, randomStr);
       },1000*5);
@@ -93,8 +100,10 @@
       this.getReadData(793098, 2668, anniTime, randomStr);
       //上海
       this.getReadData(790545, 2619, anniTime, randomStr);
-      //北京
+      //北京3月
       this.getReadData(793610, 3063, anniTime, randomStr);
+      //北京3月后
+      this.getReadData(793610, 3720, anniTime, randomStr);
       //厦门
       this.getReadData(792057, 2635, anniTime, randomStr);
 
@@ -126,7 +135,7 @@
             if (isNaN(subCount)){
               subCount = 0;
             }
-            if (seats!==subCount){
+            //if (seats!==subCount){}
               let sTime = ('0' + item["sTime"]).substr(-4);
               item["sTime"] = sTime.substr(0, 2) + ':' + sTime.substr(-2);
               let eTime = ('0' + item["eTime"]).substr(-4);
@@ -134,7 +143,7 @@
               item["dayStr"] = item["day"] + " "+ item["sTime"] + "~" + item["eTime"];
               item["leftSeats"] = seats-subCount;
               newQtTimes.push(item);
-            }
+
             });
             switch (result.data['id']) {
               case 793098:
@@ -146,8 +155,19 @@
                 _this.SHInfo = "第"+_this.searchCount+"次查询，"+new Date().toLocaleTimeString() + "，最新开放日期："+qtTimes[qtTimes.length-1]["day"];
                 break;
               case 793610:
-                _this.BJData = newQtTimes;
-                _this.BJInfo = "第"+_this.searchCount+"次查询，"+new Date().toLocaleTimeString() + "，最新开放日期："+qtTimes[qtTimes.length-1]["day"];
+                if (qtId===3720){
+                  if (_this.BJData.length>10){
+                    _this.BJData = newQtTimes;
+                  }else
+                  {
+                    _this.BJData = _this.BJData.concat(newQtTimes);
+                  }
+                  _this.BJInfo = "第"+_this.searchCount+"次查询，"+new Date().toLocaleTimeString() + "，最新开放日期："+qtTimes[qtTimes.length-1]["day"];
+                }
+                else
+                  {
+                  _this.BJData = newQtTimes;
+                }
                 break;
               case 792057:
                 _this.XMData = newQtTimes;
